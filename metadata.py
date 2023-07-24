@@ -23,33 +23,25 @@ def appmetadata() -> AppMetadata:
     
     # first set up some basic information
     metadata = AppMetadata(
-        name="Pix2struct Chyrons",
-        description="",  # briefly describe what the purpose and features of the app
-        app_license="",  # short name for a software license like MIT, Apache2, GPL, etc.
-        identifier="pix2struct-chyrons",  # should be a single string without whitespaces. If you don't intent to publish this app to the CLAMS app-directory, please use a full IRI format. 
-        url="https://fakegithub.com/some/repository",  # a website where the source code and full documentation of the app is hosted
-        # (if you are on the CLAMS team, this MUST be "https://github.com/clamsproject/app-pix2struct-chyrons"
-        # (see ``.github/README.md`` file in this directory for the reason)
-        analyzer_version='version_X', # use this IF THIS APP IS A WRAPPER of an existing computational analysis algorithm
+        name="Pix2struct Docvqa Wrapper",
+        description="extracts text from input timeframes based on user queries using the pix2struct Doc-VQA model",
+        app_license="MIT",
+        identifier="pix2struct-docvqa-wrapper",
+        url="https://github.com/clamsproject/app-pix2struct-docvqa-wrapper",
+        # use the following if this app is a wrapper of an existing computational analysis tool
         # (it is very important to pinpoint the primary analyzer version for reproducibility)
-        # (for example, when the app's implementation uses ``torch``, it doesn't make the app a "torch-wrapper")
-        # (but, when the app doesn't implementaion any additional algorithms/model/architecture, but simply use API's of existing, for exmaple, OCR software, it is a wrapper)
-        # if the analyzer is a python app, and it's specified in the requirements.txt
-        # this trick can also be useful (replace ANALYZER_NAME with the pypi dist name)
-        analyzer_version=[l.strip().rsplit('==')[-1] for l in open('requirements.txt').readlines() if re.match(r'^ANALYZER_NAME==', l)][0],
-        analyzer_license="",  # short name for a software license
+        analyzer_version='1',
+        analyzer_license="apache-2.0",
     )
-    # and then add I/O specifications: an app must have at least one input and one output
-    metadata.add_input(DocumentTypes.Document)
-    metadata.add_output(AnnotationTypes.Thing, typeSpecificProperty='property-value')
-    
+    # and then add I/O specifications: an app must have at least one input and ont output
+    metadata.add_input(DocumentTypes.VideoDocument)
+    metadata.add_output(DocumentTypes.TextDocument, description="extracted text from input timeframes based on user"
+                                                                " queries using the pix2struct Doc-VQA model")
+    metadata.add_output(AnnotationTypes.Alignment, description="alignment between text document and timeframes")
+
     # (optional) and finally add runtime parameter specifications
-    metadata.add_parameter(name='a_param', description='example parameter description',
-                           type='boolean', default='false')
-    # metadta.add_parameter(more...)
-    
-    # CHANGE this line and make sure return the compiled `metadata` instance
-    return None
+
+    return metadata
 
 
 # DO NOT CHANGE the main block
@@ -58,4 +50,4 @@ if __name__ == '__main__':
     metadata = appmetadata()
     for param in ClamsApp.universal_parameters:
         metadata.add_parameter(**param)
-    sys.stdout.write(metadata.jsonify(pretty=True))
+    sys.stdout.write(appmetadata().jsonify(pretty=True))
