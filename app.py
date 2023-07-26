@@ -1,4 +1,5 @@
 import argparse
+import logging
 from typing import Union, List, Dict, Tuple, Iterable
 
 # mostly likely you'll need these modules/classes
@@ -11,7 +12,7 @@ from transformers import Pix2StructForConditionalGeneration as psg
 from transformers import Pix2StructProcessor as psp
 
 
-class Pix2structDocvqaWrapper(ClamsApp):
+class Pix2structChyrons(ClamsApp):
 
     def __init__(self):
         super().__init__()
@@ -113,21 +114,21 @@ class Pix2structDocvqaWrapper(ClamsApp):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--port", action="store", default="5000", help="set port to listen"
-    )
+    parser.add_argument("--port", action="store", default="5000", help="set port to listen")
     parser.add_argument("--production", action="store_true", help="run gunicorn server")
-    # more arguments as needed
+    # add more arguments as needed
     # parser.add_argument(more_arg...)
 
     parsed_args = parser.parse_args()
 
     # create the app instance
-    app = Pix2structDocvqaWrapper()
+    app = Pix2structChyrons()
 
     http_app = Restifier(app, port=int(parsed_args.port))
-
+    # for running the application in production mode
     if parsed_args.production:
         http_app.serve_production()
+    # development mode
     else:
+        app.logger.setLevel(logging.DEBUG)
         http_app.run()

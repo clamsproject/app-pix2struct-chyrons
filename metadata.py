@@ -23,10 +23,10 @@ def appmetadata() -> AppMetadata:
     
     # first set up some basic information
     metadata = AppMetadata(
-        name="Pix2struct Docvqa Wrapper",
-        description="extracts text from input timeframes based on user queries using the pix2struct Doc-VQA model",
+        name="Pix2struct Chyrons",
+        description="extracts text from input timeframes based on chyron queries using the pix2struct Doc-VQA model",
         app_license="MIT",
-        identifier="pix2struct-docvqa-wrapper",
+        identifier="pix2struct-chyrons",
         url="https://github.com/clamsproject/app-pix2struct-docvqa-wrapper",
         # use the following if this app is a wrapper of an existing computational analysis tool
         # (it is very important to pinpoint the primary analyzer version for reproducibility)
@@ -35,7 +35,7 @@ def appmetadata() -> AppMetadata:
     )
     # and then add I/O specifications: an app must have at least one input and ont output
     metadata.add_input(DocumentTypes.VideoDocument)
-    metadata.add_output(DocumentTypes.TextDocument, description="extracted text from input timeframes based on user"
+    metadata.add_output(DocumentTypes.TextDocument, description="extracted text from input timeframes based on chyron
                                                                 " queries using the pix2struct Doc-VQA model")
     metadata.add_output(AnnotationTypes.Alignment, description="alignment between text document and timeframes")
 
