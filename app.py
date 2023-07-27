@@ -1,10 +1,10 @@
 import argparse
 import logging
-from typing import Union, List, Dict, Tuple, Iterable
+from typing import Union, List, Tuple, Iterable
 
 # mostly likely you'll need these modules/classes
 from clams import ClamsApp, Restifier
-from mmif import Mmif, View, Annotation, Document, AnnotationTypes, DocumentTypes
+from mmif import Mmif, View, Document, AnnotationTypes, DocumentTypes
 from mmif.utils import video_document_helper as vdh
 
 import torch
@@ -25,21 +25,6 @@ class Pix2structChyrons(ClamsApp):
         # Also check out ``metadata.py`` in this directory.
         # When using the ``metadata.py`` leave this do-nothing "pass" method here.
         pass
-
-    @staticmethod
-    def vote(candidates: List[Iterable[Tuple[str, str]]]) -> Tuple[str, str]:
-        """
-        For each question, vote on the most common answer
-        :param candidates: completion candidates
-        :return: query and the most common answer
-        """
-        answers = []
-        query: str = ""
-        for candidate in candidates:
-            for query, answer in candidate:
-                query = query
-                answers.append(answer)
-        return query, max(set(answers), key=answers.count)
 
     def generate(self, img, questions):
         """
@@ -65,41 +50,21 @@ class Pix2structChyrons(ClamsApp):
             document=video_doc.id,
         )
 
-        queries = [
-            "What is the name of the person in the image?",
-            "What is the the person's title"
-        ]
-
         query_to_label = {
-            "What is the name of the person in the image?": "person_name",
+            "What is the name of the person in the image": "person_name",
             "What is the the person's description": "person_description"
         }
 
+        queries = list(query_to_label.keys())
+
         for timeframe in input_view.get_annotations(AnnotationTypes.TimeFrame, label="chyron"):
-            print(timeframe.properties)
+            self.logger.debug(timeframe.properties)
             # get images from time frame
-            if config["sampleFrames"] == 1:
-                image = vdh.extract_mid_frame(mmif, timeframe, as_PIL=True)
-                completions = self.generate(image, queries)
-            else:
-                timeframe_length = int(timeframe.properties["end"] - timeframe.properties["start"])
-                sample_frames = config["sampleFrames"]
-                if timeframe_length < sample_frames:
-                    sample_frames = int(timeframe_length)
-                sample_ratio = int(timeframe.properties["start"]
-                                   + timeframe.properties["end"]) // sample_frames
-                tf_sample = vdh.sample_frames(timeframe.properties["start"], timeframe.properties["end"],
-                                              sample_ratio)
-                images = vdh.extract_frames_as_images(video_doc, tf_sample)
-                completions = []
-                for query in queries:
-                    candidates = []
-                    for image in images:
-                        candidates.append(self.generate(image, query))
-                    completions.append(self.vote(candidates))
+            image = vdh.extract_mid_frame(mmif, timeframe, as_PIL=True)
+            completions = self.generate(image, queries)
 
             for query, answer in completions:
-                print(f"query: {query} answer: {answer}")
+                self.logger.debug(f"query: {query} answer: {answer}")
             # add question answer pairs as properties to timeframe
                 text_document = new_view.new_textdocument(answer)
                 text_document.add_property("query", query)

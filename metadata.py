@@ -35,7 +35,7 @@ def appmetadata() -> AppMetadata:
     )
     # and then add I/O specifications: an app must have at least one input and ont output
     metadata.add_input(DocumentTypes.VideoDocument)
-    metadata.add_output(DocumentTypes.TextDocument, description="extracted text from input timeframes based on chyron
+    metadata.add_output(DocumentTypes.TextDocument, description="extracted text from input timeframes based on chyron"
                                                                 " queries using the pix2struct Doc-VQA model")
     metadata.add_output(AnnotationTypes.Alignment, description="alignment between text document and timeframes")
 
