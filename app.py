@@ -57,7 +57,7 @@ class Pix2structChyrons(ClamsApp):
 
         queries = list(query_to_label.keys())
 
-        for timeframe in input_view.get_annotations(AnnotationTypes.TimeFrame, label="chyron"):
+        for timeframe in input_view.get_annotations(AnnotationTypes.TimeFrame, frameType="chyron"):
             self.logger.debug(timeframe.properties)
             # get images from time frame
             image = vdh.extract_mid_frame(mmif, timeframe, as_PIL=True)
